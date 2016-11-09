@@ -16,7 +16,7 @@ int main() {
 	
 	cout << "Lancement algorithme complet" << endl;
 	debut = clock();
-	complete(3);
+	complete(4);
 	fin = clock();
 	cout << "Résolution en " << (fin-debut)*1000/CLOCKS_PER_SEC << " millisecondes" << endl;
 	
