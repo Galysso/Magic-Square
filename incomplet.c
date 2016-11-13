@@ -361,7 +361,7 @@ void incompleteBulle(int N) {
 }
 
 void incompleteAleatoire(int N) {
-	srand(time(NULL));
+	//srand(time(NULL));
 	
 	// Initialisation des variables
 	donnees *d = initialiserDonnees(N);

@@ -17,8 +17,8 @@ void afficherCarre(donnees *d);
 int **initialiserCarre(int N);
 void retirer(donnees *d, int i, int j);
 void ajouter(donnees *d, int n, int i, int j);
-int diagonaleGauche(int x, int y, int N);
-int diagonaleDroite(int x, int y, int N);
+bool diagonaleGauche(int x, int y, int N);
+bool diagonaleDroite(int x, int y, int N);
 bool carreTermine(donnees *d);
 
 #include "donnees.c"

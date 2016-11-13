@@ -1,5 +1,6 @@
 #include <iostream>
 #include <stdlib.h>
+#include <time.h>
 
 #include "complet.h"
 #include "donnees.h"
@@ -51,6 +52,27 @@ void afficherValues(int N, int ***values) {
 			}cout << endl;
 }
 
+int randValue(int N, int ***values, int i, int j) {
+	int max = N*N;
+	int n = 1 + rand() % max;
+	
+	while ((n <= max) && (values[i][j][n] != 0)) {
+		n = n + 1;
+	}
+	if (n > max) {
+		n = 1;
+		while ((n <= max) && (values[i][j][n] != 0)) {
+			n = n + 1;
+		}
+	}
+	
+	if (n > max) {
+		n = -1;
+	}
+	
+	return n;
+}
+
 int nextValue(int N, int ***values, int n, int i, int j) {
 	int max = N*N+1;
 	n = n+1;
@@ -82,7 +104,7 @@ void ajouterComplet(donnees *d, int ***values, int n, int i, int j) {
 }
 
 void retirerComplet(donnees *d, int ***values, int i, int j) {
-	int n = d->square[i][j];
+	//~ int n = d->square[i][j];
 	retirer(d, i, j);
 	propagationRetrait(d->N, values, i, j);
 }
@@ -99,14 +121,41 @@ void allDiff(int N, int ***values, int n, int i, int j) {
 	}
 }
 
+int minimumResteColonne(int N, int ***values, int i, int j) {
+	int n;
+	int somme = 0;
+	
+	for (i=i+1; i < N; ++i) {
+		n = nextValue(N, values, 0, i, j);
+		if (n > 0) {
+			somme = somme + n;
+		}
+	}
+	
+	return somme;
+}
+
+int maximumResteColonne(int N, int ***values, int i, int j) {
+	int n;
+	int somme = 0;
+	
+	for (i=i+1; i < N; ++i) {
+		n = lastValue(N, values, i, j);
+		if (n != -1) {
+			somme = somme + n;
+		}
+	}
+	
+	return somme;
+}
+
 int minimumResteLigne(int N, int ***values, int i, int j) {
 	int n;
 	int somme = 0;
 	
 	for (j=j+1; j < N; ++j) {
-		// amélioration ?
 		n = nextValue(N, values, 0, i, j);
-		if (n > 0) {
+		if (n != -1) {
 			somme = somme + n;
 		}
 	}
@@ -129,98 +178,204 @@ int maximumResteLigne(int N, int ***values, int i, int j) {
 	return somme;
 }
 
-void propagationDiagonaleDroite(int N, int ***values, int i, int j) {
-	// TODO
-}
-
-void propagationDiagonaleGauche(int N, int ***values, int i, int j) {
-	// TODO
-}
-/*
 void propagationLigne(donnees *d, int ***values, int i, int j) {
 	int N = d->N;
 	int ind = indice(N, i, j);
-	int nsquare = N*N;
+	int reste = d->M - d->line[i];
+	int nbCases = N-j-1;
+	int borneInf = reste - N*N*(nbCases-1) - (nbCases*(nbCases+1)/2);
+	int borneSup = reste - (nbCases-1)*(nbCases)/2;
 	
-	//~ cout << "["<<i<<"]["<<j<<"]"<<endl;
-	//~ cout << maximumResteLige(N, values, i, j) << " < " << (d->M - d->line[i]) << endl;
-	//~ afficherCarreSimple(d);
-	if ((j < N-1) && (maximumResteLigne(N, values, i, j) < (d->M - d->line[i]))) {
-		j = j + 1;
-		for (int n = 1; n < nsquare; ++n) {
-			//~ cout << "["<<i<<"]["<<j<<"]["<<n<<"]"<< endl;
-			values[i][j][n] = ind;
+	for (j=j+1; j < N; ++j) {
+		for (int n = borneInf; n > 0; --n) {		// Borne inférieure EXCLUE???? des possibilités ???
+			if (values[i][j][n] == 0) {
+				values[i][j][n] = ind;
+			}
+		}
+		for (int n = borneSup+1; n <= N*N; ++n) {	// Borne supérieure incluse dans les possibilités
+			if (values[i][j][n] == 0) {
+				values[i][j][n] = ind;
+			}
 		}
 	}
 }
-*/
 
-/// POURQUOI JE TROUVE DES COLONNES DONT LA SOMME EST PLUS DE 34 POUR N = 4 MALGRE CETTE FONCTION ?
-void propagationLigne(donnees *d, int ***values, int i, int j) {
+void propagationColonne(donnees *d, int ***values, int i, int j) {
 	int N = d->N;
 	int ind = indice(N, i, j);
-	int nsquare = N*N;
+	int reste = d->M - d->col[j];
+	int nbCases = N-i-1;
+	int borneInf = reste - N*N*(nbCases-1) - (nbCases*(nbCases+1)/2);
+	int borneSup = reste - (nbCases-1)*(nbCases)/2;
 	
-	//~ cout << "["<<i<<"]["<<j<<"]"<<endl;
-	//~ cout << maximumResteLige(N, values, i, j) << " < " << (d->M - d->line[i]) << endl;
-	//~ afficherCarreSimple(d);
-	//if (j < N-1) {
-		//j = j + 1;
-		//bool bloque = maximumResteLigne(N, values, i, j) < (d->M - d->line[i]);
-		//bloque = bloque || (minimumResteLigne(N, values, i, j) > (d->M - d->line[i]));
-		bool bloque = (minimumResteLigne(N, values, i, j) > (d->M - d->line[i]));
-		
-		if (bloque) {
-			if (j < N-1) {
-				j = j + 1;
+	for (i=i+1; i < N; ++i) {
+		for (int n = borneInf; n > 0; --n) {		// Borne inférieure EXCLUE???? des possibilités ???
+			if (values[i][j][n] == 0) {
+				values[i][j][n] = ind;
 			}
-			else if (i < N-1) {
-				i = i + 1;
-			}
-				
-			for (int n = 1; n < nsquare; ++n) {
-				//~ cout << "["<<i<<"]["<<j<<"]["<<n<<"]"<< endl;
-				if (values[i][j][n] == 0) {
-					values[i][j][n] = ind;
-				}
-			}
-		//}
-	}/* else if ((i < N-1) && (d->line[i] != d->M)) {
-		i = i + 1;
-		for (int n = 1; n < nsquare; ++n) {
-			//~ cout << "["<<i<<"]["<<j<<"]["<<n<<"]"<< endl;
-			values[i][j][n] = ind;
 		}
-	}*/
+		for (int n = borneSup+1; n <= N*N; ++n) {	// Borne supérieure incluse dans les possibilités
+			if (values[i][j][n] == 0) {
+				values[i][j][n] = ind;
+			}
+		}
+	}
 }
 
-void propagationColonne(int N, int ***values, int i, int j) {
-	// TODO
+void propagationDiagonaleGauche(donnees *d, int ***values, int i, int j) {
+	int N = d->N;
+	int ind = indice(N, i, j);
+	int reste = d->M - d->diagG;
+	int nbCases = N-i-1;
+	int borneInf = reste - N*N*(nbCases-1) - (nbCases*(nbCases+1)/2);
+	int borneSup = reste - (nbCases-1)*(nbCases)/2;
+	
+	for (i=i+1; i < N; ++i) {
+		for (int n = borneInf; n > 0; --n) {		// Borne inférieure EXCLUE???? des possibilités ???
+			if (values[i][i][n] == 0) {
+				values[i][i][n] = ind;
+			}
+		}
+		for (int n = borneSup+1; n <= N*N; ++n) {	// Borne supérieure incluse dans les possibilités
+			if (values[i][i][n] == 0) {
+				values[i][i][n] = ind;
+			}
+		}
+	}
+}
+
+void propagationDiagonaleDroite(donnees *d, int ***values, int i, int j) {
+	int N = d->N;
+	int ind = indice(N, i, j);
+	int reste = d->M - d->diagD;
+	int nbCases = N-i-1;
+	int borneInf = reste - N*N*(nbCases-1) - (nbCases*(nbCases+1)/2);
+	int borneSup = reste - (nbCases-1)*(nbCases)/2;
+	
+	for (i=i+1; i < N; ++i) {
+		j = N - i - 1;
+		for (int n = borneInf; n > 0; --n) {		// Borne inférieure EXCLUE???? des possibilités ???
+			if (values[i][j][n] == 0) {
+				values[i][j][n] = ind;
+			}
+		}
+		for (int n = borneSup+1; n <= N*N; ++n) {	// Borne supérieure incluse dans les possibilités
+			if (values[i][j][n] == 0) {
+				values[i][j][n] = ind;
+			}
+		}
+	}
+}
+
+//~ void propagationSymetrie(int N, int ***values, int n, int i, int j) {
+	//~ int val;
+	//~ int nSquare = N*N;
+	//~ int ind = indice(N, i, j);
+	
+	//~ if (i+j == 0) {
+		//~ for (val=n-1; val > 0; --val) {
+			//~ // A < B
+			//~ if (values[0][N-1][val] == 0) {
+				//~ values[0][N-1][val] = ind;
+			//~ }
+			
+			//~ // A < C
+			//~ if (values[N-1][0][val] == 0) {
+				//~ values[N-1][0][val] = ind;
+			//~ }
+		//~ }
+	//~ }
+	
+	//~ if ((i == 0) && (j == N-1)) {
+		//~ for (val=nSquare; val > n; --val) {
+			//~ // C < B
+			//~ if (values[N-1][0][val] == 0) {
+				//~ values[N-1][0][val] = ind;
+			//~ }
+		//~ }
+	//~ }
+//~ }
+
+void propagationSymetrie(int N, int ***values, int n, int i, int j) {
+	int val;
+	int nSquare = N*N;
+	int ind = indice(N, i, j);
+	
+	if (i+j == 0) {
+		for (val=n-1; val > 0; --val) {
+			// A < B
+			if (values[0][1][val] == 0) {
+				values[0][1][val] = ind;
+			}
+			
+			// A < C
+			if (values[1][0][val] == 0) {
+				values[1][0][val] = ind;
+			}
+		}
+	}
+	
+	if ((i == 0) && (j == 1)) {
+		for (val=nSquare; val > n; --val) {
+			// C < B
+			if (values[1][0][val] == 0) {
+				values[1][0][val] = ind;
+			}
+		}
+	}
 }
 
 void propagationAjout(donnees *d, int ***values, int n, int i, int j) {
-	//~ cout << "["<<i<<"]["<<j<<"]"<< endl;
-	//~ cout << lastValue(d->N, values, i, j) << endl;
-	//~ cout << maximumResteLige(d->N, values, i, j) << endl;
-	//~ afficherCarreSimple(d);
-	allDiff(d->N, values, n, i, j);
+	int N = d->N;
+	allDiff(N, values, n, i, j);
 	propagationLigne(d, values, i, j);
+	propagationColonne(d, values, i, j);
+	if (diagonaleGauche(i, j, N)) {
+		propagationDiagonaleGauche(d, values, i, j);
+	}
+	if (diagonaleDroite(i, j, N)) {
+		propagationDiagonaleDroite(d, values, i, j);
+	}
+	propagationSymetrie(N, values, n, i, j);
+	
+	values[i][j][n] = -1;
 }
 
 void propagationRetrait(int N, int ***values, int i, int j) {
+	//~ cout << "i="<<i<<" j="<<j<<endl;
 	int ind = indice(N, i, j);
 	int max = N*N;
+	int x, y, n;
 	
-	for (i; i < N; ++i) {
-		for (j=0; j < N; ++j) {
-			for (int n = 1; n <= max; ++n) {
-				if (values[i][j][n] == ind) {
-					values[i][j][n] = 0;
+	for (x = i; x < N; ++x) {
+		for (y=0; y < N; ++y) {
+			for (n = 1; n <= max; ++n) {
+				if (values[x][y][n] == ind) {
+					values[x][y][n] = 0;
 				}
 			}
 		}
 	}
+	
+	
+	if (i+j < 2*(N-1)) {
+		if (j < N-1) {
+			x = i;
+			y = j + 1;
+			//~ cout << "x="<<x<<" y="<<y<<" n="<<n<<endl;
+		} else if (i < N-1) {
+			x = i+1;
+			y = 0;
+		}
+		for (n = 1; n <= max; ++n) {
+			if (values[x][y][n] == -1) {
+				values[x][y][n] = 0;
+			}
+		}
+	}
 }
+
+/* Plutot qu'un vrai aléatoire, choisir le départ de manière aléatoire et prendre la première valeur correcte à partir de ce point de départ*/
 
 void bonCarreTrois(donnees *d, int ***values) {
 	int N = d->N;
@@ -244,60 +399,6 @@ void bonCarreTrois(donnees *d, int ***values) {
 	ajouterComplet(d,values,4,2,2);
 	afficherValues(N, values);
 }
-
-/*
-void resoudreComplet(donnees *d, int ***values) {
-	int c = 0;
-	
-	bool fini = false;
-	int N = d->N;
-	int nbCase = N*N;
-	int i = 0;			// On se place sur la première case du tableau
-	int j = 0;
-	int n = 0;
-	
-	do { c = c + 1;
-		if (c%10000000 == 0) {
-			//~ afficherCarreSimple(d);
-			//~ afficherValues(N, values);
-		}
-		n = nextValue(N, values, n, i, j);
-		
-		if (n != -1) {			// S'il existe une valeur correcte
-			retirerComplet(d, values, i, j);
-			ajouterComplet(d, values, n, i, j);	// On ajoute la valeur à la case courante
-
-			if (j < N-1) {			// Et on se place sur la case suivante
-				j = j + 1;
-				n = 0;				// On réinitialise pour la case suivante
-			} else if (i < N-1) {
-				if (d->line[i] == d->M) {
-					i = i + 1;
-					j = 0;
-					n = 0;		
-				} else {
-					retirerComplet(d, values, i, j);
-				}
-			} else if (!carreTermine(d)) {	// Si le carre est rempli et invalide
-				retirerComplet(d, values, i, j);				// On retire la dernière case du carré
-			} else {						// Sinon si le carré est valide
-				fini = true;					// On arrête l'algorithme
-			}
-		} else {				// Sinon s'il n'existe aucune valeur correcte
-			retirerComplet(d, values, i, j);		// Alors on retire la case courante (retirer 0 n'a pas d'effet)
-			
-			if (j > 0) {			// On se place sur la case précédente
-				j = j - 1;
-			} else {
-				j = N - 1;
-				i = i - 1;
-			}
-			
-			n = d->square[i][j];	// Et on récupère la valeur de la case précédente pour la changer
-		}
-	} while (!fini);
-}*/
-
 void resoudreComplet(donnees *d, int ***values) {
 	int c = 0;
 	
@@ -313,29 +414,13 @@ void resoudreComplet(donnees *d, int ***values) {
 			afficherCarre(d);
 			//~ afficherValues(N, values);
 		}
-		n = nextValue(N, values, n, i, j);
+		//~ n = nextValue(N, values, n, i, j);
+		n = randValue(N, values, i, j);
 		
 		if (n != -1) {			// S'il existe une valeur correcte
 			retirerComplet(d, values, i, j);
-			ajouterComplet(d, values, n, i, j);	// On ajoute la valeur à la case courante
+			ajouterComplet(d, values, n, i, j);	// On ajoute la valeur à la case courante			
 
-
-
-			//~ if (/*(maximumResteLigne(N,values,i,j)<(d->M-d->line[i])) || */(minimumResteLigne(N,values,i,j)>(d->M-d->line[i]))) {
-				//~ retirerComplet(d, values, i, j);
-			//~ 
-				//~ if (j > 0) {			// On se place sur la case précédente
-					//~ j = j - 1;
-				//~ } else {
-					//~ j = N - 1;
-					//~ i = i - 1;
-				//~ }
-				//~ 
-				//~ n = d->square[i][j];
-			//~ }
-			
-			
-			
 			if (j < N-1) {			// Et on se place sur la case suivante
 				j = j + 1;
 				n = 0;				// On réinitialise pour la case suivante

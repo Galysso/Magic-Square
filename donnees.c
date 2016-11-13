@@ -94,11 +94,11 @@ void ajouter(donnees *d, int n, int i, int j) {
 	d->col[j] = d->col[j] + n;
 }
 
-int diagonaleGauche(int x, int y, int N) {
+bool diagonaleGauche(int x, int y, int N) {
 	return (x==y);
 }
 
-int diagonaleDroite(int x, int y, int N) {
+bool diagonaleDroite(int x, int y, int N) {
 	return ((x+y) == (N-1));
 }
 

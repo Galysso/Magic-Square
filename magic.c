@@ -7,6 +7,7 @@
 using namespace std;
 
 int main() {
+	srand(time(NULL));
 	clock_t debut, fin;
 	
 	int N;
@@ -16,7 +17,7 @@ int main() {
 	
 	cout << "Lancement algorithme complet" << endl;
 	debut = clock();
-	complete(4);
+	complete(6);
 	fin = clock();
 	cout << "Résolution en " << (fin-debut)*1000/CLOCKS_PER_SEC << " millisecondes" << endl;
 	
