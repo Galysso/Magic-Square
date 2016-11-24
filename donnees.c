@@ -129,3 +129,60 @@ void desallouer(donnees *d) {
 		delete(square[i]);
 	}
 }
+
+void nextInd(int N, int *i, int *j) {
+	if (*j > *i) {
+		if (*j == N-1) {
+			*i = *j-*i;
+			*j = 0;
+		} else {
+			*i = *i+1;
+			*j = *j+1;
+		}
+	} else if (*i > *j) {
+		if (*i == N-1) {
+			*j = *i-*j;
+			*i = 0;
+		} else {
+			*i = *i+1;
+			*j = *j+1;
+		}
+	} else { // if (*i == *j)
+		if (*i == N-1) {
+			*i = 0;
+			*j = *j+1;
+		} else {
+			*i = *i+1;
+			*j = *j+1;
+		}
+	}
+}
+
+void prevInd(int N, int *i, int *j) {
+	if (*i > *j) {
+		if (*j == 0) {
+			*i = N-*i-1; 
+			*j = N-1;
+		} else {
+			*i == *i-1;
+			*j = *j-1;
+		}
+	} else if (*j > *i) {
+		if (*i == 0) {
+			*i = N-1;
+			*j = N-*i;
+		} else {
+			*i = *i-1;
+			*j = *j-1;
+		}
+	} else { // if (*i == *j)
+		if (*i == 0) {
+			*i = -1;
+			*j = -1;
+			cout << "ERREUR DANS PREVIOUS IND" << endl;
+		} else {
+			*i = *i-1;
+			*j = *j-1;
+		}
+	}
+}

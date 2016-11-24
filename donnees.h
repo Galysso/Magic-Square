@@ -20,6 +20,8 @@ void ajouter(donnees *d, int n, int i, int j);
 bool diagonaleGauche(int x, int y, int N);
 bool diagonaleDroite(int x, int y, int N);
 bool carreTermine(donnees *d);
+void nextInd(int N, int *i, int *j);
+void prevInd(int N, int *i, int *j);
 
 #include "donnees.c"
 
