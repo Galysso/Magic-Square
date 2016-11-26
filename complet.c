@@ -418,31 +418,21 @@ void resoudreComplet(donnees *d, int ***values) {
 		n = randValue(N, values, i, j);
 		
 		if (n != -1) {			// S'il existe une valeur correcte
-			retirerComplet(d, values, i, j);
+			//retirerComplet(d, values, i, j);
 			ajouterComplet(d, values, n, i, j);	// On ajoute la valeur à la case courante			
 
-			if (j < N-1) {			// Et on se place sur la case suivante
-				j = j + 1;
-				n = 0;				// On réinitialise pour la case suivante
-			} else if (i < N-1) {
-				i = i + 1;
-				j = 0;
-				n = 0;		
+			if (i!=N-1 || j!=N-1) {			// Et on se place sur la case suivante
+				nextInd(N, &i, &j);	
 			} else if (!carreTermine(d)) {	// Si le carre est rempli et invalide
 				retirerComplet(d, values, i, j);				// On retire la dernière case du carré
 			} else {						// Sinon si le carré est valide
 				fini = true;					// On arrête l'algorithme
 			}
 		} else {				// Sinon s'il n'existe aucune valeur correcte
-			retirerComplet(d, values, i, j);		// Alors on retire la case courante (retirer 0 n'a pas d'effet)
+			//retirerComplet(d, values, i, j);		// Alors on retire la case courante (retirer 0 n'a pas d'effet)
 			
-			if (j > 0) {			// On se place sur la case précédente
-				j = j - 1;
-			} else {
-				j = N - 1;
-				i = i - 1;
-			}
-			
+			prevInd(N, &i, &j);
+			retirerComplet(d, values, i, j);
 			n = d->square[i][j];	// Et on récupère la valeur de la case précédente pour la changer
 		}
 	} while (!fini);
