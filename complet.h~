@@ -12,7 +12,7 @@ void propagationAjout(donnees *d, int ***values, int n, int i, int j);
 void propagationRetrait(int N, int ***values, int i, int j);
 void allDiff(int N, int ***values, int n);
 void bonCarreTrois(donnees *d, int ***values);
-bool resoudreComplet(donnees *d, int ***values);
+void resoudreComplet(donnees *d, int ***values);
 void complete(int N);
 
 #include "complet.c"

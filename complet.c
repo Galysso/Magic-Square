@@ -399,10 +399,11 @@ void bonCarreTrois(donnees *d, int ***values) {
 	ajouterComplet(d,values,4,2,2);
 	afficherValues(N, values);
 }
-void resoudreComplet(donnees *d, int ***values) {
+bool resoudreComplet(donnees *d, int ***values) {
 	int c = 0;
 	
 	bool fini = false;
+	bool aUneSolution = true;
 	int N = d->N;
 	int nbCase = N*N;
 	int i = 0;			// On se place sur la première case du tableau
@@ -428,14 +429,16 @@ void resoudreComplet(donnees *d, int ***values) {
 			} else {						// Sinon si le carré est valide
 				fini = true;					// On arrête l'algorithme
 			}
-		} else {				// Sinon s'il n'existe aucune valeur correcte
-			//retirerComplet(d, values, i, j);		// Alors on retire la case courante (retirer 0 n'a pas d'effet)
-			
+		} else if (i==0 && j==0) {				// Sinon s'il n'existe aucune valeur correcte
+			fini = true;		// Alors on retire la case courante (retirer 0 n'a pas d'effet)
+			aUneSolution = false;
+		} else {
 			prevInd(N, &i, &j);
 			retirerComplet(d, values, i, j);
 			n = d->square[i][j];	// Et on récupère la valeur de la case précédente pour la changer
 		}
 	} while (!fini);
+	return aUneSolution;
 }
 
 void complete(int N) {
@@ -444,8 +447,13 @@ void complete(int N) {
 	int ***values = initialiserValues(N);
 	
 	// Resolution
-	resoudreComplet(d, values);
+	if (resoudreComplet(d, values)) {
 	
-	// Affichage
-	afficherCarreSimple(d);
+		// Affichage
+		afficherCarreSimple(d);
+		
+	} else {
+		cout << "Aucune solution existante pour un carré de taille " << N << " :'(" << endl;
+		cout << "Toutefois, 42 semble répondre à la question" << endl << endl;
+	}
 }
