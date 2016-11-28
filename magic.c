@@ -21,8 +21,10 @@ int main() {
 			cin >> reponse;
 		} while (reponse.compare("C")!=0 && reponse.compare("c")!=0 && reponse.compare("I")!=0 && reponse.compare("i")!=0);
 		
-		if (reponse.compare("C")!=0 || reponse.compare("c")!=0) {
+		if (reponse.compare("C")==0 || reponse.compare("c")==0) {
 			complet = true;
+		} else {
+			complet = false;
 		}
 		
 		cout << "Taille du carré : ";
