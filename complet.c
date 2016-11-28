@@ -121,87 +121,18 @@ void allDiff(int N, int ***values, int n, int i, int j) {
 	}
 }
 
-int minimumResteColonne(int N, int ***values, int i, int j) {
-	int n;
-	int somme = 0;
-	
-	for (i=i+1; i < N; ++i) {
-		n = nextValue(N, values, 0, i, j);
-		if (n > 0) {
-			somme = somme + n;
-		}
-	}
-	
-	return somme;
-}
-
-int maximumResteColonne(int N, int ***values, int i, int j) {
-	int n;
-	int somme = 0;
-	
-	for (i=i+1; i < N; ++i) {
-		n = lastValue(N, values, i, j);
-		if (n != -1) {
-			somme = somme + n;
-		}
-	}
-	
-	return somme;
-}
-
-int minimumResteLigne(int N, int ***values, int i, int j) {
-	int n;
-	int somme = 0;
-	int tab[N-j-2];
-	int c;
-	
-	for (j=j+2; j < N; ++j) {
-		n = nextValue(N, values, 0, i, j);
-		i = 0;
-		
-		while (c < N-j-2) {
-			i = 0;
-			while (tab[c]!=n && tab[c]!=0) {
-				++i;
-			}
-			if (tab[c]==0) {
-				tab[c] = n;
-				somme = somme + n;
-			} else {
-				somme = N*N+1;
-				c = n;
-				j = N;
-			}
-		}
-	}
-	
-	return somme;
-}
-
-int maximumResteLigne(int N, int ***values, int i, int j) {
-	int n;
-	int somme = 0;
-	
-	for (j=j+1; j < N; ++j) {
-		n = lastValue(N, values, i, j);
-		if (n != -1) {
-			somme = somme + n;
-		}
-	}
-	
-	// a vérifier (être précis sur les indices)
-	return somme;
-}
-
 void propagationLigne(donnees *d, int ***values, int i, int j) {
-	int N = d->N;
-	int ind = indice(N, i, j);
-	int reste = d->M - d->line[i];
-	int nbCases = N-j-1;
-	int borneInf = reste - N*N*(nbCases-1) - (nbCases*(nbCases+1)/2);
-	int borneSup = reste - (nbCases-1)*(nbCases)/2 + 1;
+	if (j < d->N-1) {
+		int N = d->N;
+		int ind = indice(N, i, j);
+		int reste = d->M - d->line[i];
+		int nbCases = N-j-1;
+		int borneInf = reste - N*N*(nbCases-1) - (nbCases*(nbCases+1)/2);
+		int borneSup = reste - (nbCases-1)*(nbCases)/2 + 1;
 	
-	for (j=j+1; j < N; ++j) {
+	//~ for (j=j+1; j < N; ++j) {
+	
+		j = j + 1;
 		for (int n = borneInf; n > 0; --n) {		// Borne inférieure EXCLUE???? des possibilités ???
 			if (values[i][j][n] == 0) {
 				values[i][j][n] = ind;
@@ -213,17 +144,21 @@ void propagationLigne(donnees *d, int ***values, int i, int j) {
 			}
 		}
 	}
+	//~ }
 }
 
 void propagationColonne(donnees *d, int ***values, int i, int j) {
-	int N = d->N;
-	int ind = indice(N, i, j);
-	int reste = d->M - d->col[j];
-	int nbCases = N-i-1;
-	int borneInf = reste - N*N*(nbCases-1) - (nbCases*(nbCases+1)/2);
-	int borneSup = reste - (nbCases-1)*(nbCases)/2;
+	if (i < d->N-1) {
+		int N = d->N;
+		int ind = indice(N, i, j);
+		int reste = d->M - d->col[j];
+		int nbCases = N-i-1;
+		int borneInf = reste - N*N*(nbCases-1) - (nbCases*(nbCases+1)/2);
+		int borneSup = reste - (nbCases-1)*(nbCases)/2;
 	
-	for (i=i+1; i < N; ++i) {
+	//~ for (i=i+1; i < N; ++i) {
+	
+		i = i + 1;
 		for (int n = borneInf; n > 0; --n) {		// Borne inférieure EXCLUE???? des possibilités ???
 			if (values[i][j][n] == 0) {
 				values[i][j][n] = ind;
@@ -235,17 +170,22 @@ void propagationColonne(donnees *d, int ***values, int i, int j) {
 			}
 		}
 	}
+	//~ }
 }
 
 void propagationDiagonaleGauche(donnees *d, int ***values, int i, int j) {
-	int N = d->N;
-	int ind = indice(N, i, j);
-	int reste = d->M - d->diagG;
-	int nbCases = N-i-1;
-	int borneInf = reste - N*N*(nbCases-1) - (nbCases*(nbCases+1)/2);
-	int borneSup = reste - (nbCases-1)*(nbCases)/2;
+	if (i < d->N-1) {
+		int N = d->N;
+		int ind = indice(N, i, j);
+		int reste = d->M - d->diagG;
+		int nbCases = N-i-1;
+		int borneInf = reste - N*N*(nbCases-1) - (nbCases*(nbCases+1)/2);
+		int borneSup = reste - (nbCases-1)*(nbCases)/2;
 	
-	for (i=i+1; i < N; ++i) {
+	//~ for (i=i+1; i < N; ++i) {
+	
+		i = i + 1;
+		j = j + 1;
 		for (int n = borneInf; n > 0; --n) {		// Borne inférieure EXCLUE???? des possibilités ???
 			if (values[i][i][n] == 0) {
 				values[i][i][n] = ind;
@@ -257,18 +197,22 @@ void propagationDiagonaleGauche(donnees *d, int ***values, int i, int j) {
 			}
 		}
 	}
+	//~ }
 }
 
 void propagationDiagonaleDroite(donnees *d, int ***values, int i, int j) {
-	int N = d->N;
-	int ind = indice(N, i, j);
-	int reste = d->M - d->diagD;
-	int nbCases = N-i-1;
-	int borneInf = reste - N*N*(nbCases-1) - (nbCases*(nbCases+1)/2);
-	int borneSup = reste - (nbCases-1)*(nbCases)/2;
+	if (i < d->N-1) {
+		int N = d->N;
+		int ind = indice(N, i, j);
+		int reste = d->M - d->diagD;
+		int nbCases = N-i-1;
+		int borneInf = reste - N*N*(nbCases-1) - (nbCases*(nbCases+1)/2);
+		int borneSup = reste - (nbCases-1)*(nbCases)/2;
 	
-	for (i=i+1; i < N; ++i) {
-		j = N - i - 1;
+	//~ for (i=i+1; i < N; ++i) {
+	
+		i = i + 1;
+		j = j = j - 1;
 		for (int n = borneInf; n > 0; --n) {		// Borne inférieure EXCLUE???? des possibilités ???
 			if (values[i][j][n] == 0) {
 				values[i][j][n] = ind;
@@ -280,6 +224,7 @@ void propagationDiagonaleDroite(donnees *d, int ***values, int i, int j) {
 			}
 		}
 	}
+	//~ }
 }
 
 //~ void propagationSymetrie(int N, int ***values, int n, int i, int j) {
