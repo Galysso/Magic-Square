@@ -38,7 +38,7 @@ int main() {
 		} else {
 			cout << "Lancement algorithme incomplet" << endl;
 			debut = clock();
-			incompleteTotal(20);
+			incompleteTotal(N);
 			fin = clock();
 			cout << "Résolution en " << (fin-debut)*1000/CLOCKS_PER_SEC << " millisecondes" << endl;
 		}

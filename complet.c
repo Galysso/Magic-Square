@@ -152,11 +152,26 @@ int maximumResteColonne(int N, int ***values, int i, int j) {
 int minimumResteLigne(int N, int ***values, int i, int j) {
 	int n;
 	int somme = 0;
+	int tab[N-j-2];
+	int c;
 	
-	for (j=j+1; j < N; ++j) {
+	for (j=j+2; j < N; ++j) {
 		n = nextValue(N, values, 0, i, j);
-		if (n != -1) {
-			somme = somme + n;
+		i = 0;
+		
+		while (c < N-j-2) {
+			i = 0;
+			while (tab[c]!=n && tab[c]!=0) {
+				++i;
+			}
+			if (tab[c]==0) {
+				tab[c] = n;
+				somme = somme + n;
+			} else {
+				somme = N*N+1;
+				c = n;
+				j = N;
+			}
 		}
 	}
 	
@@ -184,7 +199,7 @@ void propagationLigne(donnees *d, int ***values, int i, int j) {
 	int reste = d->M - d->line[i];
 	int nbCases = N-j-1;
 	int borneInf = reste - N*N*(nbCases-1) - (nbCases*(nbCases+1)/2);
-	int borneSup = reste - (nbCases-1)*(nbCases)/2;
+	int borneSup = reste - (nbCases-1)*(nbCases)/2 + 1;
 	
 	for (j=j+1; j < N; ++j) {
 		for (int n = borneInf; n > 0; --n) {		// Borne inférieure EXCLUE???? des possibilités ???
@@ -192,7 +207,7 @@ void propagationLigne(donnees *d, int ***values, int i, int j) {
 				values[i][j][n] = ind;
 			}
 		}
-		for (int n = borneSup+1; n <= N*N; ++n) {	// Borne supérieure incluse dans les possibilités
+		for (int n = borneSup; n <= N*N; ++n) {	// Borne supérieure incluse dans les possibilités
 			if (values[i][j][n] == 0) {
 				values[i][j][n] = ind;
 			}
@@ -304,22 +319,22 @@ void propagationSymetrie(int N, int ***values, int n, int i, int j) {
 	if (i+j == 0) {
 		for (val=n-1; val > 0; --val) {
 			// A < B
-			if (values[0][1][val] == 0) {
-				values[0][1][val] = ind;
+			if (values[0][N-1][val] == 0) {
+				values[0][N-1][val] = ind;
 			}
 			
 			// A < C
-			if (values[1][0][val] == 0) {
-				values[1][0][val] = ind;
+			if (values[N-1][0][val] == 0) {
+				values[N-1][0][val] = ind;
 			}
 		}
 	}
 	
-	if ((i == 0) && (j == 1)) {
+	if ((i == 0) && (j == N-1)) {
 		for (val=nSquare; val > n; --val) {
 			// C < B
-			if (values[1][0][val] == 0) {
-				values[1][0][val] = ind;
+			if (values[N-1][0][val] == 0) {
+				values[N-1][0][val] = ind;
 			}
 		}
 	}
@@ -423,9 +438,11 @@ bool resoudreComplet(donnees *d, int ***values) {
 			ajouterComplet(d, values, n, i, j);	// On ajoute la valeur à la case courante			
 
 			if (i!=N-1 || j!=N-1) {			// Et on se place sur la case suivante
-				nextInd(N, &i, &j);	
+				nextInd(N, &i, &j);
+				n = 0;
 			} else if (!carreTermine(d)) {	// Si le carre est rempli et invalide
-				retirerComplet(d, values, i, j);				// On retire la dernière case du carré
+				retirerComplet(d, values, i, j);	// On retire la dernière case du carré
+				n = 0;
 			} else {						// Sinon si le carré est valide
 				fini = true;					// On arrête l'algorithme
 			}
