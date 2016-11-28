@@ -264,22 +264,22 @@ void propagationSymetrie(int N, int ***values, int n, int i, int j) {
 	if (i+j == 0) {
 		for (val=n-1; val > 0; --val) {
 			// A < B
-			if (values[0][N-1][val] == 0) {
-				values[0][N-1][val] = ind;
+			if (values[0][N/2][val] == 0) {
+				values[0][N/2][val] = ind;
 			}
 			
-			// A < C
-			if (values[N-1][0][val] == 0) {
-				values[N-1][0][val] = ind;
-			}
+			/*// A < C
+			if (values[N/2][0][val] == 0) {
+				values[N/2][0][val] = ind;
+			}*/
 		}
 	}
 	
-	if ((i == 0) && (j == N-1)) {
+	if ((i == 0) && (j == N/2)) {
 		for (val=nSquare; val > n; --val) {
 			// C < B
-			if (values[N-1][0][val] == 0) {
-				values[N-1][0][val] = ind;
+			if (values[N/2][0][val] == 0) {
+				values[N/2][0][val] = ind;
 			}
 		}
 	}
