@@ -34,13 +34,13 @@ int main() {
 		if (complet) {
 			cout << "Lancement algorithme complet" << endl;
 			debut = clock();
-			complete(N);
+			complete(N, 5);
 			fin = clock();
 			cout << "Résolution en " << (fin-debut)*1000/CLOCKS_PER_SEC << " millisecondes" << endl;
 		} else {
 			cout << "Lancement algorithme incomplet" << endl;
 			debut = clock();
-			incompleteTotal(N);
+			incompleteTotal(N, 5);
 			fin = clock();
 			cout << "Résolution en " << (fin-debut)*1000/CLOCKS_PER_SEC << " millisecondes" << endl;
 		}
@@ -50,7 +50,7 @@ int main() {
 			cin >> reponse;
 		} while (reponse.compare("O")!=0 && reponse.compare("o")!=0 && reponse.compare("N")!=0 && reponse.compare("n")!=0);
 		
-		if (reponse.compare("O") || reponse.compare("o")) {
+		if (reponse.compare("O")==0 || reponse.compare("o")==0) {
 			refaire = true;
 		} else {
 			refaire = false;

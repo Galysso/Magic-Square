@@ -292,9 +292,6 @@ void resoudreIncompletAleatoire(donnees *d) {
 	
 	while (!carreTermine(d)) {//cout << "iteration" << endl;
 		
-		//~ cout << "-------------------------------------------" << endl;
-		//~ afficherCarre(d);
-		
 		echanges = echangeAleatoire(d);
 		echangesTot = echangesTot + echanges;
 		iterations = iterations + 1;
@@ -306,13 +303,16 @@ void resoudreIncompletAleatoire(donnees *d) {
 	}
 }
 
-void resoudreIncompletTotal(donnees *d) {
+void resoudreIncompletTotal(donnees *d, int temps) {
+	temps = temps*CLOCKS_PER_SEC;
 	double echangesTot = 0;
 	double echanges = 0;
 	double iterations = 1;
 	double restarts = 1;
+	int debut = clock();
+	int actuel = debut;
 	
-	while (!carreTermine(d)) {
+	while (!carreTermine(d) && (actuel-debut < temps)) {
 		echanges = echangeTotal(d);
 		echangesTot = echangesTot + echanges;
 		iterations = iterations + 1;
@@ -321,6 +321,7 @@ void resoudreIncompletTotal(donnees *d) {
 			restarts = restarts + 1;
 			restart(d);
 		}
+		actuel = clock();
 	}
 }
 
@@ -378,7 +379,7 @@ void incompleteAleatoire(int N) {
 	afficherCarre(d);
 }
 
-void incompleteTotal(int N) {
+void incompleteTotal(int N, int temps) {
 	// Initialisation des variables
 	donnees *d = initialiserDonnees(N);
 	//~ remplirCarreIncomplet(d);
@@ -387,7 +388,7 @@ void incompleteTotal(int N) {
 	
 	// Resolution
 	
-	resoudreIncompletTotal(d);
+	resoudreIncompletTotal(d, temps);
 	
 	// Affichage
 	afficherCarre(d);

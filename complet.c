@@ -359,7 +359,10 @@ void bonCarreTrois(donnees *d, int ***values) {
 	ajouterComplet(d,values,4,2,2);
 	afficherValues(N, values);
 }
-bool resoudreComplet(donnees *d, int ***values) {
+bool resoudreComplet(donnees *d, int ***values, int temps) {
+	temps = temps*CLOCKS_PER_SEC;
+	int debut = clock();
+	int actuel = debut;
 	int c = 0;
 	
 	bool fini = false;
@@ -399,23 +402,29 @@ bool resoudreComplet(donnees *d, int ***values) {
 			retirerComplet(d, values, i, j);
 			n = d->square[i][j];	// Et on récupère la valeur de la case précédente pour la changer
 		}
+		actuel = clock();
+		/*cout << debut << endl;
+		cout << actuel << endl;
+		cout << temps << endl;*/
+		fini = fini || (actuel-debut >= temps);
 	} while (!fini);
 	return aUneSolution;
 }
 
-void complete(int N) {
+void complete(int N, int temps) {
 	// Initialisation des variables
 	donnees *d = initialiserDonnees(N);
 	int ***values = initialiserValues(N);
 	
 	// Resolution
-	if (resoudreComplet(d, values)) {
-	
-		// Affichage
-		afficherCarreSimple(d);
-		
+	if (resoudreComplet(d, values, temps)) {
+		if (d->square[N-1][N-1]==0) {
+			cout << "Aucune solution existante pour un carré de taille " << N << " :'(" << endl;
+			cout << "Toutefois, 42 semble répondre à la question" << endl << endl;
+		} else {
+			afficherCarreSimple(d);
+		}
 	} else {
-		cout << "Aucune solution existante pour un carré de taille " << N << " :'(" << endl;
-		cout << "Toutefois, 42 semble répondre à la question" << endl << endl;
+		cout << "L'algorithme n'a pas trouvé de solution dans le temps donné" << endl;
 	}
 }
